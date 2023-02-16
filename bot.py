@@ -22,9 +22,11 @@ def _get_eth_gas_price() -> float:
     ua = UserAgent()
     req = requests.get('https://etherscan.io/gastracker', headers={'user-agent': ua.random, 'Content-Type': 'text/html'})
     soup = BeautifulSoup(req.text, 'html.parser')
-    price = soup.find('span', attrs={'id':'ContentPlaceHolder1_ltGasPrice'})
-    if price is None:
+    try:
+        price = soup.find('span', attrs={'id':'ContentPlaceHolder1_ltGasPrice'})
+    except AttributeError:
         price = soup.find('span', attrs={'id':'spanLowPrice'})
+
     return float(price.text)
 
 def _get_real_future_eth_price() -> float:
@@ -60,7 +62,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         
         time.sleep(1)
     
-app = ApplicationBuilder().token("bot_token").build()
+app = ApplicationBuilder().token("token").build()
 
 app.add_handler(CommandHandler("start", start))
 
